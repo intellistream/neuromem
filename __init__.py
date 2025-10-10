@@ -7,17 +7,17 @@ vector databases, key-value stores, and graph structures.
 
 from .memory_manager import MemoryManager
 from .memory_collection import (
-    BaseCollection,
-    VDBCollection,
-    KVCollection,
-    GraphCollection,
+    BaseMemoryCollection,
+    VDBMemoryCollection,
+    KVMemoryCollection,
+    GraphMemoryCollection,
 )
 
 __version__ = "0.1.0"
 __all__ = [
     "MemoryManager",
-    "BaseCollection",
-    "VDBCollection",
-    "KVCollection",
-    "GraphCollection",
+    "BaseMemoryCollection",
+    "VDBMemoryCollection",
+    "KVMemoryCollection",
+    "GraphMemoryCollection",
 ]
