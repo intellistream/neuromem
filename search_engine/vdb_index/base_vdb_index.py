@@ -11,23 +11,39 @@ class BaseVDBIndex(ABC):
         """ """
 
     @abstractmethod
-    def insert(self, vector: np.ndarray, string_id: str) -> None:
-        """插入单个向量"""
+    def insert(self, vector: np.ndarray, string_id: str) -> int:
+        """插入单个向量
+        
+        Returns:
+            int: 1表示成功，0表示失败
+        """
         pass
 
     @abstractmethod
-    def batch_insert(self, vectors: List[np.ndarray], string_ids: List[str]) -> None:
-        """批量插入向量"""
+    def batch_insert(self, vectors: List[np.ndarray], string_ids: List[str]) -> int:
+        """批量插入向量
+        
+        Returns:
+            int: 成功插入的向量数量
+        """
         pass
 
     @abstractmethod
-    def delete(self, string_id: str) -> None:
-        """删除一个向量（物理或逻辑）"""
+    def delete(self, string_id: str) -> int:
+        """删除一个向量（物理或逻辑）
+        
+        Returns:
+            int: 1表示成功，0表示失败
+        """
         pass
 
     @abstractmethod
-    def update(self, string_id: str, new_vector: np.ndarray) -> None:
-        """更新向量内容"""
+    def update(self, string_id: str, new_vector: np.ndarray) -> int:
+        """更新向量内容
+        
+        Returns:
+            int: 1表示成功，0表示失败
+        """
         pass
 
     @abstractmethod
@@ -39,17 +55,27 @@ class BaseVDBIndex(ABC):
 
     @classmethod
     @abstractmethod
-    def load(cls, name: str, root_path: str) -> "BaseVDBIndex":
+    def load(cls, name: str, dir_path: str) -> "BaseVDBIndex":
         """
         加载索引实例。
         Load the index instance.
+        
+        Args:
+            name: 索引名称
+            dir_path: 索引存储目录路径
         """
         pass
 
     @abstractmethod
-    def store(self, root_path: str) -> Dict[str, Any]:
+    def store(self, dir_path: str) -> Dict[str, Any]:
         """
         存储索引数据到指定目录。
         Store the index data to the specified directory.
+        
+        Args:
+            dir_path: 索引存储目录路径
+            
+        Returns:
+            Dict[str, Any]: 存储的元数据
         """
         pass

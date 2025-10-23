@@ -237,7 +237,7 @@ class FaissIndex(BaseVDBIndex):
             int_ids_np = np.array(
                 [new_rev_map[sid] for sid in valid_ids], dtype=np.int64
             )
-            self.index.add_with_ids(np_vectors, int_ids_np)
+            self.index.add_with_ids(np_vectors, int_ids_np)  # type: ignore
         else:
             # 如果没有有效向量，创建空索引
             self.index, self._deletion_supported = self._init_index()
@@ -659,12 +659,12 @@ class FaissIndex(BaseVDBIndex):
             self.vector_store = {}
 
     @classmethod
-    def load(cls, name: str, load_path: str) -> "FaissIndex":
+    def load(cls, name: str, dir_path: str) -> "FaissIndex":
         """
         从指定路径加载索引，name参数用于验证
         """
         # 读取meta.json获取保存的参数
-        meta_path = os.path.join(load_path, "meta.json")
+        meta_path = os.path.join(dir_path, "meta.json")
         with open(meta_path, "r", encoding="utf-8") as f:
             meta = json.load(f)
 
@@ -689,7 +689,7 @@ class FaissIndex(BaseVDBIndex):
         instance.vector_store = {}  # 将在_load_data中加载
 
         # 加载保存的数据
-        instance._load_data(load_path)
+        instance._load_data(dir_path)
         return instance
 
 
