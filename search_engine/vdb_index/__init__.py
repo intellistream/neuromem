@@ -57,19 +57,16 @@ def create_index(config: Dict[str, Any]) -> BaseVDBIndex:
     return index_factory.create_index(config)
 
 
-# 自动注册FAISS索引
-def _auto_register_indexes():
-    """自动注册已知的索引类型"""
-    try:
-        from .faiss_index import FaissIndex
+# 注册FAISS索引（faiss-cpu是必需依赖）
+def _register_faiss_index():
+    """注册FAISS索引类型"""
+    from .faiss_index import FaissIndex
 
-        register_index_type("FAISS", FaissIndex)
-    except ImportError:
-        pass
+    register_index_type("FAISS", FaissIndex)
 
 
-# 执行自动注册
-_auto_register_indexes()
+# 执行注册
+_register_faiss_index()
 
 
 # 导出公共接口
