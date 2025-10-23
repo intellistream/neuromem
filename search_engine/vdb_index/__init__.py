@@ -40,7 +40,7 @@ class VDBIndexFactory:
             raise ValueError(f"不支持的索引类型: {backend_type}")
 
         index_class = self._index_registry[backend_type]
-        return index_class(config=config)
+        return index_class(config=config)  # type: ignore[call-arg]
 
 
 # 全局工厂实例
