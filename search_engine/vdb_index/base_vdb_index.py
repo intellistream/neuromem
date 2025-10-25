@@ -7,7 +7,7 @@ import numpy as np
 
 
 class BaseVDBIndex(ABC):
-    def __init__(self):
+    def __init__(self):  # noqa: B027
         """ """
 
     @abstractmethod
