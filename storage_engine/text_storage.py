@@ -2,12 +2,8 @@
 # python -m sage.core.sage.middleware.services.neuromem..storage_engine.text_storage
 
 
-from .kv_backend.base_kv_backend import (
-    BaseKVBackend,
-)
-from .kv_backend.dict_kv_backend import (
-    DictKVBackend,
-)
+from .kv_backend.base_kv_backend import BaseKVBackend
+from .kv_backend.dict_kv_backend import DictKVBackend
 
 
 class TextStorage:

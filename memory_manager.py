@@ -5,18 +5,10 @@ from typing import Any
 
 from sage.common.utils.logging.custom_logger import CustomLogger
 
-from .memory_collection.base_collection import (
-    BaseMemoryCollection,
-)
-from .memory_collection.graph_collection import (
-    GraphMemoryCollection,
-)
-from .memory_collection.kv_collection import (
-    KVMemoryCollection,
-)
-from .memory_collection.vdb_collection import (
-    VDBMemoryCollection,
-)
+from .memory_collection.base_collection import BaseMemoryCollection
+from .memory_collection.graph_collection import GraphMemoryCollection
+from .memory_collection.kv_collection import KVMemoryCollection
+from .memory_collection.vdb_collection import VDBMemoryCollection
 from .utils.path_utils import get_default_data_dir
 
 

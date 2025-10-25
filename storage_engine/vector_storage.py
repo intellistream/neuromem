@@ -6,12 +6,8 @@ from typing import Any
 
 import numpy as np
 
-from .kv_backend.base_kv_backend import (
-    BaseKVBackend,
-)
-from .kv_backend.dict_kv_backend import (
-    DictKVBackend,
-)
+from .kv_backend.base_kv_backend import BaseKVBackend
+from .kv_backend.dict_kv_backend import DictKVBackend
 
 
 class VectorStorage:

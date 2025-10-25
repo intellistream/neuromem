@@ -8,9 +8,7 @@ from typing import Any
 import bm25s
 import Stemmer
 
-from .base_kv_index import (
-    BaseKVIndex,
-)
+from .base_kv_index import BaseKVIndex
 
 
 class BM25sIndex(BaseKVIndex):

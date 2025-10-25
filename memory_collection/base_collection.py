@@ -5,9 +5,7 @@ import hashlib
 from collections.abc import Callable
 from typing import Any
 
-from ..storage_engine.metadata_storage import (
-    MetadataStorage,
-)
+from ..storage_engine.metadata_storage import MetadataStorage
 from ..storage_engine.text_storage import TextStorage
 
 # from sage.middleware.services.neuromem..storage_engine.text_storage import TextStorage

@@ -5,12 +5,9 @@ from typing import Any
 
 import faiss
 import numpy as np
-
 from sage.common.utils.logging.custom_logger import CustomLogger
 
-from .base_vdb_index import (
-    BaseVDBIndex,
-)
+from .base_vdb_index import BaseVDBIndex
 
 
 class FaissIndex(BaseVDBIndex):

@@ -7,15 +7,13 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
-
-from sage.common.components.sage_embedding.embedding_api import apply_embedding_model
+from sage.common.components.sage_embedding.embedding_api import \
+    apply_embedding_model
 from sage.common.utils.logging.custom_logger import CustomLogger
 
 from ..search_engine.vdb_index import index_factory
 from ..utils.path_utils import get_default_data_dir
-from .base_collection import (
-    BaseMemoryCollection,
-)
+from .base_collection import BaseMemoryCollection
 
 
 class VDBMemoryCollection(BaseMemoryCollection):
@@ -593,9 +591,8 @@ class VDBMemoryCollection(BaseMemoryCollection):
             try:
                 # 直接使用索引类的load方法
                 if idx_type == "FaissIndex":
-                    from ..search_engine.vdb_index.faiss_index import (
-                        FaissIndex,
-                    )
+                    from ..search_engine.vdb_index.faiss_index import \
+                        FaissIndex
 
                     idx = FaissIndex.load(index_name, idx_path)
                 else:

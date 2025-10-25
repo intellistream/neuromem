@@ -6,14 +6,11 @@ from collections.abc import Callable
 from typing import Any
 
 import yaml
-
 from sage.common.utils.logging.custom_logger import CustomLogger
 
 from ..search_engine.kv_index import KVIndexFactory
 from ..utils.path_utils import get_default_data_dir
-from .base_collection import (
-    BaseMemoryCollection,
-)
+from .base_collection import BaseMemoryCollection
 
 # 通过config文件指定默认索引，neuromem默认索引，用户指定索引
 
