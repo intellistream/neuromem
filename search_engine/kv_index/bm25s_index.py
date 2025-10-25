@@ -3,7 +3,7 @@
 
 import os
 import shutil
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import bm25s
 import Stemmer
@@ -16,7 +16,7 @@ from .base_kv_index import (
 class BM25sIndex(BaseKVIndex):
     def __init__(
         self,
-        config: Optional[dict] = None,
+        config: dict | None = None,
     ):
         """
         Initialize BM25sIndex.
@@ -36,9 +36,9 @@ class BM25sIndex(BaseKVIndex):
             raise ValueError("索引名称(name)未在config中指定")
 
         # 初始化基本属性
-        self.ids: List[str] = []
-        self.texts: List[str] = []
-        self.tokens: List[List[str]] = []
+        self.ids: list[str] = []
+        self.texts: list[str] = []
+        self.tokens: list[list[str]] = []
         self.tokenizer = None
         self.bm25 = None
 
@@ -47,7 +47,7 @@ class BM25sIndex(BaseKVIndex):
         self.language = self.config.get("language", "auto")  # auto, zh, en
         self.custom_stopwords = self.config.get("custom_stopwords", None)
 
-    def _get_tokenizer(self, texts: List[str]):
+    def _get_tokenizer(self, texts: list[str]):
         """
         根据文本内容和配置选择合适的分词器（中文或英文）。
         Select appropriate tokenizer (Chinese or English) according to the content of texts and config.
@@ -68,7 +68,7 @@ class BM25sIndex(BaseKVIndex):
                 stopwords=self.custom_stopwords or "en", stemmer=stemmer
             )
 
-    def _build_index(self, texts: List[str], ids: List[str]):
+    def _build_index(self, texts: list[str], ids: list[str]):
         """
         构建BM25索引
         Build BM25 index
@@ -80,7 +80,7 @@ class BM25sIndex(BaseKVIndex):
         self.bm25 = bm25s.BM25(corpus=self.texts, backend=self.backend)
         self.bm25.index(self.tokens)
 
-    def build_index(self, texts: List[str], ids: List[str]):
+    def build_index(self, texts: list[str], ids: list[str]):
         """
         构建BM25索引的公共方法。
         Public method to build BM25 index.
@@ -140,7 +140,7 @@ class BM25sIndex(BaseKVIndex):
         self.texts[idx] = new_text
         self._rebuild()
 
-    def search(self, text: str, topk: int = 5) -> List[str]:
+    def search(self, text: str, topk: int = 5) -> list[str]:
         """
         对输入文本进行检索，返回最相关的topk个id。
         Search for the most relevant texts and return the top-k ids.
@@ -152,7 +152,7 @@ class BM25sIndex(BaseKVIndex):
         topk_idx = sorted(range(len(scores)), key=lambda i: -scores[i])[:topk]
         return [self.ids[i] for i in topk_idx]
 
-    def store(self, dir_path: str) -> Dict[str, Any]:
+    def store(self, dir_path: str) -> dict[str, Any]:
         """
         将索引信息存储到指定目录，包含bm25模型、分词器、ids和texts。
         Store the index info into the specified directory, including bm25 model, tokenizer, ids, and texts.
@@ -201,7 +201,7 @@ class BM25sIndex(BaseKVIndex):
         if os.path.exists(meta_path):
             import json
 
-            with open(meta_path, "r", encoding="utf-8") as f:
+            with open(meta_path, encoding="utf-8") as f:
                 meta = json.load(f)
             self.config = meta.get("config", {})
             self.backend = meta.get("backend", "numba")
@@ -217,9 +217,9 @@ class BM25sIndex(BaseKVIndex):
         self.tokenizer.load_stopwords(dir_path)
 
         # 加载ids和texts
-        with open(os.path.join(dir_path, "ids.txt"), "r", encoding="utf-8") as f:
+        with open(os.path.join(dir_path, "ids.txt"), encoding="utf-8") as f:
             self.ids = [line.strip() for line in f.readlines()]
-        with open(os.path.join(dir_path, "texts.txt"), "r", encoding="utf-8") as f:
+        with open(os.path.join(dir_path, "texts.txt"), encoding="utf-8") as f:
             self.texts = [line.strip() for line in f.readlines()]
 
         # 重建tokens

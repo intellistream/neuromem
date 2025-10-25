@@ -2,7 +2,7 @@
 # python -m sage.core.sage.middleware.services.neuromem..storage_engine.vector_storage
 
 import json
-from typing import Any, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -20,10 +20,10 @@ class VectorStorage:
     基于哈希ID的简单向量存储器。
     """
 
-    def __init__(self, backend: Optional[BaseKVBackend] = None):
+    def __init__(self, backend: BaseKVBackend | None = None):
         self.backend = backend or DictKVBackend()
 
-    def get_all_ids(self) -> List[str]:
+    def get_all_ids(self) -> list[str]:
         return self.backend.get_all_keys()
 
     def has(self, item_id: str) -> bool:
@@ -48,7 +48,7 @@ class VectorStorage:
             json.dump(save_dict, f, ensure_ascii=False, indent=2)
 
     def load_from_disk(self, path: str):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
         # type: ignore for IDE/static checker
         for k, v in data.items():

@@ -9,16 +9,16 @@ class VDBIndexFactory:
     """向量数据库索引工厂类 - 简化版本"""
 
     # 注册的索引类型映射
-    _index_registry: Dict[str, Type[BaseVDBIndex]] = {}
+    _index_registry: dict[str, type[BaseVDBIndex]] = {}
 
     @classmethod
-    def register_index(cls, index_type: str, index_class: Type[BaseVDBIndex]):
+    def register_index(cls, index_type: str, index_class: type[BaseVDBIndex]):
         """注册新的索引类型"""
         if not issubclass(index_class, BaseVDBIndex):
             raise TypeError(f"Index class {index_class} must inherit from BaseVDBIndex")
         cls._index_registry[index_type.upper()] = index_class
 
-    def create_index(self, config: Dict[str, Any]) -> BaseVDBIndex:
+    def create_index(self, config: dict[str, Any]) -> BaseVDBIndex:
         """
         创建索引 - 简化版本，只支持config方式创建
 
@@ -47,12 +47,12 @@ class VDBIndexFactory:
 index_factory = VDBIndexFactory()
 
 
-def register_index_type(index_type: str, index_class: Type[BaseVDBIndex]):
+def register_index_type(index_type: str, index_class: type[BaseVDBIndex]):
     """注册新的索引类型"""
     VDBIndexFactory.register_index(index_type, index_class)
 
 
-def create_index(config: Dict[str, Any]) -> BaseVDBIndex:
+def create_index(config: dict[str, Any]) -> BaseVDBIndex:
     """创建索引"""
     return index_factory.create_index(config)
 

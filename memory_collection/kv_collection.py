@@ -2,9 +2,11 @@ import inspect
 import json
 import os
 import shutil
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import yaml
+
 from sage.common.utils.logging.custom_logger import CustomLogger
 
 from ..search_engine.kv_index import KVIndexFactory
@@ -18,7 +20,7 @@ from .base_collection import (
 
 def load_config(path: str) -> dict:
     """加载YAML配置文件"""
-    with open(path, "r") as f:
+    with open(path) as f:
         return yaml.safe_load(f)
 
 
@@ -32,7 +34,7 @@ class KVMemoryCollection(BaseMemoryCollection):
     2. 通过load方法恢复：KVMemoryCollection.load(name, load_path)
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         初始化KVMemoryCollection
 
@@ -101,7 +103,7 @@ class KVMemoryCollection(BaseMemoryCollection):
             return None
 
     @classmethod
-    def load(cls, name: str, load_path: Optional[str] = None) -> "KVMemoryCollection":
+    def load(cls, name: str, load_path: str | None = None) -> "KVMemoryCollection":
         """
         从磁盘加载KVMemoryCollection实例
 
@@ -124,7 +126,7 @@ class KVMemoryCollection(BaseMemoryCollection):
 
         return instance
 
-    def store(self, store_path: Optional[str] = None) -> Dict[str, Any]:
+    def store(self, store_path: str | None = None) -> dict[str, Any]:
         """
         将集合保存到磁盘
 
@@ -182,7 +184,7 @@ class KVMemoryCollection(BaseMemoryCollection):
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"No config found for collection at {config_path}")
 
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
         self.default_topk = config.get("default_topk", 5)
         self.default_index_type = config.get("default_index_type", "bm25s")
@@ -216,7 +218,7 @@ class KVMemoryCollection(BaseMemoryCollection):
         self.logger.info(f"成功加载集合 '{self.name}'，包含 {len(self.indexes)} 个索引")
 
     @staticmethod
-    def clear(name: str, clear_path: Optional[str] = None) -> None:
+    def clear(name: str, clear_path: str | None = None) -> None:
         """
         清理指定的集合
 
@@ -241,7 +243,7 @@ class KVMemoryCollection(BaseMemoryCollection):
     def insert(
         self,
         raw_text: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
         *index_names: str,
     ):
         """
@@ -296,7 +298,7 @@ class KVMemoryCollection(BaseMemoryCollection):
         self,
         former_text: str,
         new_text: str,
-        new_metadata: Optional[Dict[str, Any]] = None,
+        new_metadata: dict[str, Any] | None = None,
         *index_names: str,
     ) -> str:
         """
@@ -327,10 +329,10 @@ class KVMemoryCollection(BaseMemoryCollection):
     def retrieve(
         self,
         raw_text: str,
-        topk: Optional[int] = None,
-        with_metadata: Optional[bool] = False,
-        index_name: Optional[str] = None,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        topk: int | None = None,
+        with_metadata: bool | None = False,
+        index_name: str | None = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         """
@@ -374,8 +376,8 @@ class KVMemoryCollection(BaseMemoryCollection):
 
     def create_index(
         self,
-        config: Optional[Dict[str, Any]] = None,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        config: dict[str, Any] | None = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         """
@@ -478,7 +480,7 @@ class KVMemoryCollection(BaseMemoryCollection):
         self.logger.info(f"索引 '{index_name}' 重建完成")
         return True
 
-    def list_index(self) -> List[Dict[str, str]]:
+    def list_index(self) -> list[dict[str, str]]:
         """
         列出当前所有索引及其描述信息。
         返回结构：[{"name": ..., "description": ...}, ...]

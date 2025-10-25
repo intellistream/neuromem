@@ -1,15 +1,15 @@
 # file sage/core/sage.middleware.services.neuromem./search_engine/kv_index/base_kv_index.py
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class BaseKVIndex(ABC):
     def __init__(
         self,
-        config: Optional[dict] = None,
-        texts: Optional[List[str]] = None,
-        ids: Optional[List[str]] = None,
+        config: dict | None = None,
+        texts: list[str] | None = None,
+        ids: list[str] | None = None,
     ):
         """
         初始化索引基类。
@@ -35,7 +35,7 @@ class BaseKVIndex(ABC):
         pass
 
     @abstractmethod
-    def search(self, query: str, topk: int = 10) -> List[str]:
+    def search(self, query: str, topk: int = 10) -> list[str]:
         """
         检索相关数据，返回最相关的id列表。
         Search for relevant entries and return the most relevant ids.
@@ -60,7 +60,7 @@ class BaseKVIndex(ABC):
         pass
 
     @abstractmethod
-    def store(self, root_path: str) -> Dict[str, Any]:
+    def store(self, root_path: str) -> dict[str, Any]:
         """
         存储索引数据到指定目录。
         Store the index data to the specified directory.

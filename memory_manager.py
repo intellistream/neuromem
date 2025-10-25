@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from sage.common.utils.logging.custom_logger import CustomLogger
 
@@ -25,24 +25,26 @@ class MemoryManager:
     内存管理器，管理不同类型的 MemoryCollection 实例
     """
 
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: str | None = None):
         self.logger = CustomLogger()
 
-        self.collections: Dict[str, BaseMemoryCollection] = {}
-        self.collection_metadata: Dict[str, Dict[str, Any]] = {}
-        self.collection_status: Dict[str, str] = {}  # 状态表: "loaded" or "on_disk"
+        self.collections: dict[str, BaseMemoryCollection] = {}
+        self.collection_metadata: dict[str, dict[str, Any]] = {}
+        self.collection_status: dict[str, str] = {}  # 状态表: "loaded" or "on_disk"
 
         # 从默认目录data/sage_memory获取disk中的manager(如果有)
         self.data_dir = data_dir or get_default_data_dir()
         self.manager_path = os.path.join(self.data_dir, "manager.json")
         self._load_manager()
 
-    def create_collection(self, config: Dict[str, Any] = {}):
+    def create_collection(self, config: dict[str, Any] = None):
         """
         创建新的collection并返回
         """
 
         # 检查 name 参数，必须存在
+        if config is None:
+            config = {}
         name = config.get("name")
         if not name:
             self.logger.warning("`name` is required in config but not provided.")
@@ -89,7 +91,7 @@ class MemoryManager:
         """检查collection是否存在（内存或磁盘）"""
         return name in self.collections or name in self.collection_metadata
 
-    def get_collection(self, name: str) -> Optional[BaseMemoryCollection]:
+    def get_collection(self, name: str) -> BaseMemoryCollection | None:
         """优先返回内存collection，不在内存则尝试磁盘懒加载并发警告"""
         if name in self.collections:
             return self.collections[name]
@@ -156,7 +158,7 @@ class MemoryManager:
 
         self._save_manager()
 
-    def store_collection(self, name: Optional[str] = None):
+    def store_collection(self, name: str | None = None):
         """
         只保存已加载（即被用过的）的collection及manager信息
         """
@@ -186,12 +188,12 @@ class MemoryManager:
         """只加载collection_metadata和状态，不加载任何collection本体"""
         if not os.path.exists(self.manager_path):
             return
-        with open(self.manager_path, "r", encoding="utf-8") as f:
+        with open(self.manager_path, encoding="utf-8") as f:
             self.collection_metadata = json.load(f)
         for name in self.collection_metadata:
             self.collection_status[name] = "on_disk"
 
-    def _load_collection(self, name: str) -> Optional[BaseMemoryCollection]:
+    def _load_collection(self, name: str) -> BaseMemoryCollection | None:
         """懒加载collection进内存"""
         if name not in self.collection_metadata:
             self.logger.warning(f"Collection '{name}' metadata not found in manager.")
@@ -217,8 +219,8 @@ class MemoryManager:
         return collection
 
     def list_collection(
-        self, name: Optional[str] = None
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        self, name: str | None = None
+    ) -> dict[str, Any] | list[dict[str, Any]]:
         """
         列出一个或所有 collection 的基本信息。
         List basic info of one or all collections.
@@ -239,7 +241,7 @@ class MemoryManager:
             ]
 
     def rename(
-        self, former_name: str, new_name: str, new_description: Optional[str] = None
+        self, former_name: str, new_name: str, new_description: str | None = None
     ):
         """重命名 collection 并更新描述"""
         if former_name not in self.collection_metadata:

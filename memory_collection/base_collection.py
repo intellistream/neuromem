@@ -2,7 +2,8 @@
 # python -m sage.core.sage.middleware.services.neuromem.memory_collection.base_collection
 
 import hashlib
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 from ..storage_engine.metadata_storage import (
     MetadataStorage,
@@ -38,10 +39,10 @@ class BaseMemoryCollection:
 
     def filter_ids(
         self,
-        ids: List[str],
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        ids: list[str],
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Filter given IDs based on metadata filter rag or exact match conditions.
         基于元数据过滤函数或条件筛选给定ID列表中的条目。
@@ -60,7 +61,7 @@ class BaseMemoryCollection:
 
         return matched_ids
 
-    def get_all_ids(self) -> List[str]:
+    def get_all_ids(self) -> list[str]:
         """
         Get all stored item IDs.
         获取所有存储的条目ID。
@@ -75,7 +76,7 @@ class BaseMemoryCollection:
         """
         self.metadata_storage.add_field(field_name)
 
-    def insert(self, raw_text: str, metadata: Optional[Dict[str, Any]] = None) -> str:
+    def insert(self, raw_text: str, metadata: dict[str, Any] | None = None) -> str:
         """
         Store raw text with optional metadata.
         存储原始文本与可选的元数据。自动注册未知的元数据字段。
@@ -96,7 +97,7 @@ class BaseMemoryCollection:
     def retrieve(
         self,
         with_metadata: bool = False,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         """

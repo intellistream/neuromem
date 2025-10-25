@@ -3,9 +3,11 @@ import inspect
 import json
 import os
 import shutil
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
+
 from sage.common.components.sage_embedding.embedding_api import apply_embedding_model
 from sage.common.utils.logging.custom_logger import CustomLogger
 
@@ -26,7 +28,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
     2. 通过VDBMemoryCollection.load(name, vdb_path)恢复式创建
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.name = config["name"]
         super().__init__(self.name)
 
@@ -42,7 +44,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
         self.embedding_model_factory = {}
 
     # 创建某个索引（不插入数据）
-    def create_index(self, config: Optional[dict] = None):
+    def create_index(self, config: dict | None = None):
         """
         创建新的向量索引。
         """
@@ -150,7 +152,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
     def update_index(
         self,
         index_name: str,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         """
@@ -185,7 +187,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
     def init_index(
         self,
         index_name: str,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         """
@@ -270,7 +272,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
 
     # 批量数据插入（仅存入collection，不创建索引）
     def batch_insert_data(
-        self, data: List[str], metadatas: Optional[List[Dict[str, Any]]] = None
+        self, data: list[str], metadatas: list[dict[str, Any]] | None = None
     ):
         """
         批量插入数据到collection中（仅存储，不创建索引）
@@ -297,7 +299,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
 
     # 单条数据插入（必须指定索引插入）
     def insert(
-        self, index_name: str, raw_data: str, metadata: Optional[Dict[str, Any]] = None
+        self, index_name: str, raw_data: str, metadata: dict[str, Any] | None = None
     ):
         # 检查索引是否存在
         if index_name not in self.index_info:
@@ -367,10 +369,10 @@ class VDBMemoryCollection(BaseMemoryCollection):
         self,
         raw_data: str,
         index_name: str,
-        topk: Optional[int] = None,
-        threshold: Optional[float] = None,
+        topk: int | None = None,
+        threshold: float | None = None,
         with_metadata: bool = False,
-        metadata_filter_func: Optional[Callable[[Dict[str, Any]], bool]] = None,
+        metadata_filter_func: Callable[[dict[str, Any]], bool] | None = None,
         **metadata_conditions,
     ):
         if index_name not in self.index_info:
@@ -448,7 +450,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
         index_name: str,
         old_data: str,
         new_data: str,
-        new_metadata: Optional[Dict[str, Any]] = None,
+        new_metadata: dict[str, Any] | None = None,
     ):
         old_id = self._get_stable_id(old_data)
         if not self.text_storage.has(old_id):
@@ -490,7 +492,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
         except Exception:
             return lambda m: True
 
-    def store(self, store_path: Optional[str] = None):
+    def store(self, store_path: str | None = None):
         self.logger.debug("VDBMemoryCollection: store called")
 
         if store_path is None:
@@ -545,7 +547,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
         return {"collection_path": collection_dir}
 
     @classmethod
-    def load(cls, name: str, vdb_path: Optional[str] = None):
+    def load(cls, name: str, vdb_path: str | None = None):
         """
         从磁盘加载VDBMemoryCollection实例
 
@@ -565,7 +567,7 @@ class VDBMemoryCollection(BaseMemoryCollection):
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"No config found for collection at {config_path}")
 
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
 
         # 使用新的初始化方式创建实例
@@ -666,7 +668,7 @@ if __name__ == "__main__":
 
             # 固定维度和种子设置，匹配 mockembedder 的实现
             fixed_dim = 128
-            seed = int(hashlib.sha256("mock-model".encode()).hexdigest()[:8], 16)
+            seed = int(hashlib.sha256(b"mock-model").hexdigest()[:8], 16)
 
             if not text.strip():
                 return torch.zeros(fixed_dim)
@@ -744,9 +746,9 @@ if __name__ == "__main__":
             metadata = {"type": "test", "priority": "high"}
 
             # 插入文本到默认索引
-            id1 = collection.insert("default_index", texts[0])
+            collection.insert("default_index", texts[0])
             # 插入文本，带metadata
-            id2 = collection.insert("default_index", texts[1], metadata=metadata)
+            collection.insert("default_index", texts[1], metadata=metadata)
 
             # 创建自定义索引并插入文本
             custom_index_config = {
@@ -759,7 +761,7 @@ if __name__ == "__main__":
             }
             collection.create_index(config=custom_index_config)
             collection.init_index("custom_index")
-            id3 = collection.insert("custom_index", texts[2], metadata=metadata)
+            collection.insert("custom_index", texts[2], metadata=metadata)
 
             print(colored("✓ 数据插入成功", "green"))
 

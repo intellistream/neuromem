@@ -1,10 +1,11 @@
 import json
 import os
 import pickle
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import faiss
 import numpy as np
+
 from sage.common.utils.logging.custom_logger import CustomLogger
 
 from .base_vdb_index import (
@@ -13,7 +14,7 @@ from .base_vdb_index import (
 
 
 class FaissIndex(BaseVDBIndex):
-    def __init__(self, config: Optional[dict]):
+    def __init__(self, config: dict | None):
         super().__init__()
         """
         初始化 FaissIndex 实例，支持两种初始化方式：
@@ -41,8 +42,8 @@ class FaissIndex(BaseVDBIndex):
             )
 
         self.dim = self.config.get("dim", 128)
-        self.id_map: Dict[int, str] = {}
-        self.rev_map: Dict[str, int] = {}
+        self.id_map: dict[int, str] = {}
+        self.rev_map: dict[str, int] = {}
         self.next_id: int = 1
         self.tombstones: set[str] = set()
         self.tombstone_threshold = self.config.get("tombstone_threshold", 30)
@@ -54,10 +55,10 @@ class FaissIndex(BaseVDBIndex):
             self.index = faiss.IndexIDMap(self.index)
 
         # 用于检测重复向量的容器
-        self.vector_hashes: Dict[str, str] = {}  # vector_hash -> string_id
+        self.vector_hashes: dict[str, str] = {}  # vector_hash -> string_id
 
         # 存储向量副本用于重建索引
-        self.vector_store: Dict[str, np.ndarray] = {}  # string_id -> vector
+        self.vector_store: dict[str, np.ndarray] = {}  # string_id -> vector
 
     def _init_index(self):
         config = self.config  # 保持全程都叫config
@@ -261,7 +262,7 @@ class FaissIndex(BaseVDBIndex):
         """
         return faiss.METRIC_L2 if metric_str == "L2" else faiss.METRIC_INNER_PRODUCT
 
-    def _build_index(self, vectors: List[np.ndarray], ids: List[str]):
+    def _build_index(self, vectors: list[np.ndarray], ids: list[str]):
         """
         构建初始索引并绑定 string ID → int ID 映射关系
         Build initial index and bind string ID to int ID mapping
@@ -286,7 +287,7 @@ class FaissIndex(BaseVDBIndex):
         self.index.add_with_ids(np_vectors, int_ids_np)  # type: ignore
 
         # 存储向量副本和哈希
-        for vector, string_id in zip(vectors, ids):
+        for vector, string_id in zip(vectors, ids, strict=False):
             self.vector_store[string_id] = vector.astype("float32").flatten()
             vector_hash = self._get_vector_hash(vector)
             self.vector_hashes[vector_hash] = string_id
@@ -422,7 +423,7 @@ class FaissIndex(BaseVDBIndex):
         self,
         query_vector: np.ndarray,
         topk: int = 10,
-        threshold: Optional[float] = None,
+        threshold: float | None = None,
     ):
         """
         向量检索 / Vector search
@@ -453,7 +454,7 @@ class FaissIndex(BaseVDBIndex):
         results = []
         filtered_distances = []
 
-        for i, dist in zip(int_ids[0], distances[0]):
+        for i, dist in zip(int_ids[0], distances[0], strict=False):
             if i == -1:  # FAISS 空槽位标记
                 continue
             string_id = self.id_map.get(i)
@@ -533,7 +534,7 @@ class FaissIndex(BaseVDBIndex):
         self.logger.info(f"成功插入向量，ID: {string_id}")
         return 1
 
-    def batch_insert(self, vectors: List[np.ndarray], string_ids: List[str]) -> int:
+    def batch_insert(self, vectors: list[np.ndarray], string_ids: list[str]) -> int:
         """
         批量插入多个向量及其对应的 string_id
         Batch insert multiple vectors and their corresponding string_id
@@ -547,7 +548,7 @@ class FaissIndex(BaseVDBIndex):
         valid_ids = []
         success_count = 0
 
-        for vector, string_id in zip(vectors, string_ids):
+        for vector, string_id in zip(vectors, string_ids, strict=False):
             # 检查向量是否重复
             vector_hash = self._get_vector_hash(vector)
             if vector_hash in self.vector_hashes:
@@ -587,7 +588,7 @@ class FaissIndex(BaseVDBIndex):
         self.index.add_with_ids(np_vectors, int_ids_np)  # type: ignore
 
         # 记录向量哈希和存储
-        for vector, string_id in zip(valid_vectors, valid_ids):
+        for vector, string_id in zip(valid_vectors, valid_ids, strict=False):
             vector_hash = self._get_vector_hash(vector)
             self.vector_hashes[vector_hash] = string_id
             self.vector_store[string_id] = vector.astype("float32").flatten()
@@ -596,7 +597,7 @@ class FaissIndex(BaseVDBIndex):
         self.logger.info(f"批量插入完成，成功插入 {success_count} 个向量")
         return success_count
 
-    def store(self, dir_path: str) -> Dict[str, Any]:
+    def store(self, dir_path: str) -> dict[str, Any]:
         """
         将FAISS索引、参数和映射全部保存到指定目录。
         """
@@ -665,7 +666,7 @@ class FaissIndex(BaseVDBIndex):
         """
         # 读取meta.json获取保存的参数
         meta_path = os.path.join(dir_path, "meta.json")
-        with open(meta_path, "r", encoding="utf-8") as f:
+        with open(meta_path, encoding="utf-8") as f:
             meta = json.load(f)
 
         # 验证索引名称
@@ -714,7 +715,7 @@ if __name__ == "__main__":
     ):
         ids_pass = list(expected_ids) == list(actual_ids)
         dists_pass = all(
-            abs(e - a) < 10**-digits for e, a in zip(expected_dists, actual_dists)
+            abs(e - a) < 10**-digits for e, a in zip(expected_dists, actual_dists, strict=False)
         )
         status = "通过" if ids_pass and dists_pass else "不通过"
         color = "green" if status == "通过" else "red"
@@ -749,7 +750,7 @@ if __name__ == "__main__":
     index = FaissIndex(config=config)
 
     # 先插入初始数据
-    for vector, vector_id in zip(vectors, ids):
+    for vector, vector_id in zip(vectors, ids, strict=False):
         result = index.insert(vector, vector_id)
         if result != 1:
             print(f"初始插入失败: {vector_id}")

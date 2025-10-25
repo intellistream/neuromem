@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any
 
 
 class BaseGraphIndex(ABC):
@@ -31,7 +31,7 @@ class BaseGraphIndex(ABC):
         pass
 
     @abstractmethod
-    def get_neighbors(self, node_id: str, k: int = 10) -> List[str]:
+    def get_neighbors(self, node_id: str, k: int = 10) -> list[str]:
         """获取指定节点的前 k 个邻居节点"""
         pass
 

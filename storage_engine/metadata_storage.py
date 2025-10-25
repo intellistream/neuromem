@@ -1,9 +1,7 @@
 # file sage/core/sage.middleware.services.neuromem./storage_engine/metadata_storage.py
 # python -m sage.core.sage.middleware.services.neuromem..storage_engine.metadata_storage
 
-from typing import Any, Dict, List, Optional
-
-from sage.common.utils.logging.custom_logger import CustomLogger
+from typing import Any
 
 from .kv_backend.base_kv_backend import (
     BaseKVBackend,
@@ -24,7 +22,7 @@ class MetadataStorage:
         backend (BaseKVBackend): Backend storage implementation
     """
 
-    def __init__(self, backend: Optional[BaseKVBackend] = None):
+    def __init__(self, backend: BaseKVBackend | None = None):
         # Registered metadata fields 已注册的元数据字段名集合
         self.fields = set()
         # 底层存储后端，默认是内存字典
@@ -59,7 +57,7 @@ class MetadataStorage:
         """
         return field_name in self.fields
 
-    def validate_fields(self, metadata: Dict[str, Any]) -> None:
+    def validate_fields(self, metadata: dict[str, Any]) -> None:
         """
         Validate that all fields in the metadata are registered.
         验证所有元数据字段是否已注册。
@@ -77,7 +75,7 @@ class MetadataStorage:
         if unregistered:
             raise ValueError(f"Unregistered metadata fields: {unregistered}")
 
-    def store(self, item_id: str, metadata: Dict[str, Any]) -> None:
+    def store(self, item_id: str, metadata: dict[str, Any]) -> None:
         """
         Store metadata for an item.
         存储条目的元数据。
@@ -99,7 +97,7 @@ class MetadataStorage:
         self.validate_fields(metadata)
         self.backend.set(item_id, metadata.copy())
 
-    def get_all_ids(self) -> List[str]:
+    def get_all_ids(self) -> list[str]:
         """
         Get all stored item IDs.
         获取所有已存储的条目ID。
@@ -109,7 +107,7 @@ class MetadataStorage:
         """
         return self.backend.get_all_keys()
 
-    def get(self, item_id: str) -> Dict[str, Any]:
+    def get(self, item_id: str) -> dict[str, Any]:
         """
         Get metadata for an item.
         获取条目的元数据。

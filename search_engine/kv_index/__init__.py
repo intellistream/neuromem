@@ -22,9 +22,9 @@ class KVIndexFactory:
         cls,
         index_type: str,
         index_name: str,
-        texts: List[str],
-        ids: List[str],
-        config: Optional[Dict[str, Any]] = None,
+        texts: list[str],
+        ids: list[str],
+        config: dict[str, Any] | None = None,
     ) -> BaseKVIndex:
         """
         创建指定类型的索引实例
@@ -91,7 +91,7 @@ class KVIndexFactory:
         return index_class.load(index_name, dir_path)
 
     @classmethod
-    def get_supported_types(cls) -> List[str]:
+    def get_supported_types(cls) -> list[str]:
         """
         获取所有支持的索引类型
         Get all supported index types

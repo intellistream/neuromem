@@ -1,7 +1,6 @@
 # file sage/core/sage.middleware.services.neuromem./storage_engine/text_storage.py
 # python -m sage.core.sage.middleware.services.neuromem..storage_engine.text_storage
 
-from typing import List, Optional
 
 from .kv_backend.base_kv_backend import (
     BaseKVBackend,
@@ -18,11 +17,11 @@ class TextStorage:
     简单的原始文本存储器，由外部提供稳定 ID（不生成哈希）。
     """
 
-    def __init__(self, backend: Optional[BaseKVBackend] = None):
+    def __init__(self, backend: BaseKVBackend | None = None):
         # 支持自定义后端，默认用内存字典
         self.backend = backend or DictKVBackend()
 
-    def get_all_ids(self) -> List[str]:
+    def get_all_ids(self) -> list[str]:
         return self.backend.get_all_keys()
 
     def has(self, item_id: str) -> bool:
