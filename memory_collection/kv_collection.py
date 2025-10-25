@@ -6,6 +6,7 @@ from collections.abc import Callable
 from typing import Any
 
 import yaml
+
 from sage.common.utils.logging.custom_logger import CustomLogger
 
 from ..search_engine.kv_index import KVIndexFactory
