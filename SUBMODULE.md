@@ -56,7 +56,7 @@ git commit -m "chore: update neuromem to latest"
 
 **Problem:** You're in the main repository trying to commit submodule files.
 
-**Solution:** 
+**Solution:**
 ```bash
 cd packages/sage-middleware/src/sage/middleware/components/sage_mem/neuromem  # Enter the submodule first
 git add .
